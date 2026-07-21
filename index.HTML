@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presupuesto - Peti Polarizados</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap');
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f4f6f9;
+            color: #333333;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 800px;
+            background: #ffffff;
+            margin: 0 auto;
+            padding: 30px 30px 25px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            position: relative;
+            border: 1px solid #e1e4e8;
+            overflow: hidden;
+            min-height: 1050px; /* Estirado para ocupar óptimamente el A4 */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Marca de agua grande y centrada en el espacio libre inferior */
+        .watermark {
+            position: absolute;
+            bottom: 110px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 520px; /* Tamaño mayor para aprovechar el área libre */
+            height: auto;
+            opacity: 0.08; /* Perfecta visibilidad sin opacar textos */
+            z-index: 0;
+            pointer-events: none;
+            object-fit: contain;
+        }
+
+        /* Asegurar que todo el contenido quede por encima de la marca de agua */
+        .header, .meta-info, .table-responsive, .btn-add, .bottom-section, .notes-section, .footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Encabezado */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #1a252f;
+            padding-bottom: 22px;
+            margin-bottom: 22px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .logo {
+            width: 85px;
+            height: 85px;
+            object-fit: contain;
+            background-color: transparent;
+        }
+
+        .brand-info h1 {
+            font-size: 24px;
+            font-weight: 900;
+            color: #1a252f;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .brand-info p {
+            font-size: 11px;
+            font-weight: 600;
+            color: #555555;
+            margin-top: 3px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            line-height: 1.35;
+        }
+
+        .invoice-details {
+            text-align: right;
+        }
+
+        .invoice-type {
+            display: inline-block;
+            border: 2px solid #1a252f;
+            color: #1a252f;
+            padding: 5px 14px;
+            font-size: 20px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .invoice-number-box {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .invoice-number-box span {
+            font-weight: 800;
+            color: #e74c3c;
+        }
+
+        /* Meta Info del Cliente */
+        .meta-info {
+            display: grid;
+            grid-template-columns: 2fr 1fr 2fr;
+            gap: 15px;
+            margin-bottom: 22px;
+            font-size: 13px;
+            background: #f8f9fa;
+            padding: 18px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-info div {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .meta-info strong {
+            color: #1a252f;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .meta-info input {
+            border: 1px solid #ced4da;
+            background: #ffffff;
+            padding: 9px;
+            border-radius: 4px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            color: #333;
+            width: 100% !important;
+        }
+
+        /* Tabla de ítems con más relleno */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 12px 10px;
+            text-align: left;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #1a252f;
+            color: #ffffff;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        td input {
+            width: 100%;
+            border: 1px solid #ced4da;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            outline: none;
+            color: #333;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .editable-desc {
+            width: 100%;
+            min-height: 34px;
+            outline: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            color: #333;
+            word-break: break-word;
+            white-space: pre-wrap;
+            background: #ffffff;
+            border: 1px solid #ced4da;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .editable-desc:focus, .editable-notes:focus, td input:focus {
+            background: #fff;
+            border-color: #1a252f;
+        }
+
+        .col-cant { width: 12%; text-align: center; }
+        .col-desc { width: 43%; }
+        .col-precio { width: 18%; text-align: right; }
+        .col-sub { width: 18%; text-align: right; font-weight: 600; }
+        .col-accion { width: 9%; text-align: center; }
+
+        .btn-add, .btn-delete {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 9px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+
+        .btn-delete {
+            background: #c0392b;
+            padding: 7px 10px;
+        }
+
+        .btn-add:hover { background: #219653; }
+        .btn-delete:hover { background: #962d22; }
+
+        /* Validez y Totales */
+        .bottom-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 22px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .validity-box {
+            flex: 1;
+            min-width: 250px;
+            font-size: 13px;
+            color: #555;
+            background: #f8f9fa;
+            border: 1px solid #e1e4e8;
+            padding: 15px;
+            border-radius: 6px;
+            line-height: 1.5;
+        }
+
+        .validity-box strong {
+            color: #1a252f;
+        }
+
+        .totals-box {
+            width: 100%;
+            max-width: 320px;
+            border: 1px solid #e1e4e8;
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin-left: auto;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 7px 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .total-row.final {
+            border-top: 2px solid #1a252f;
+            margin-top: 8px;
+            padding-top: 12px;
+            font-size: 16px;
+            font-weight: 900;
+            color: #1a252f;
+        }
+
+        /* Notas / Observaciones más amplias */
+        .notes-section {
+            margin-bottom: 22px;
+            background: #f8f9fa;
+            border: 1px solid #e1e4e8;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .notes-section label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #1a252f;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .editable-notes {
+            width: 100%;
+            min-height: 80px; /* Mayor espacio vertical para notas completas */
+            outline: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            color: #333;
+            word-break: break-word;
+            white-space: pre-wrap;
+            background: #ffffff;
+            border: 1px solid #ced4da;
+            padding: 10px;
+            border-radius: 4px;
+            line-height: 1.5;
+        }
+
+        /* Pie de página */
+        .footer {
+            border-top: 1px solid #e1e4e8;
+            padding-top: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            font-size: 12px;
+            color: #666;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .footer-left {
+            line-height: 1.6;
+        }
+
+        /* Botones de acción */
+        .actions-bar {
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            background: #1a252f;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: background 0.2s;
+        }
+
+        .btn-action:hover {
+            background: #2c3e50;
+        }
+
+        .btn-new {
+            background: #2980b9;
+        }
+        .btn-new:hover {
+            background: #1f618d;
+        }
+
+        /* Estilos específicos para impresión / PDF */
+        @media print {
+            @page {
+                size: A4;
+                margin: 8mm;
+            }
+            body {
+                background: white !important;
+                padding: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                max-width: 100%;
+                width: 100%;
+                min-height: 280mm;
+            }
+            .watermark {
+                opacity: 0.08 !important;
+            }
+            .actions-bar, .btn-add, .col-accion, th.col-accion {
+                display: none !important;
+            }
+            td input, .meta-info input, .editable-desc, .editable-notes {
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="presupuestoContainer">
+    <!-- Marca de agua grande en el área libre inferior -->
+    <img src="marca-agua.png" alt="Marca de agua" class="watermark">
+
+    <!-- Encabezado con logo principal y servicios -->
+    <div class="header">
+        <div class="brand-section">
+            <img src="logo.png" alt="Peti Polarizados Logo" class="logo">
+            <div class="brand-info">
+                <h1>PETI POLARIZADOS</h1>
+                <p>Polarizados - Parado de grietas en parabrisas</p>
+                <p>Grabado de Patentes - Plotters - Vinilos - Carteles a Medida</p>
+            </div>
+        </div>
+        <div class="invoice-details">
+            <div class="invoice-type">X</div>
+            <div class="invoice-number-box">
+                Presupuesto N°: <span id="numeroPresupuesto">0001</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Datos del cliente, fecha y dirección -->
+    <div class="meta-info">
+        <div>
+            <strong>Cliente:</strong> 
+            <input type="text" id="nombreCliente" placeholder="Nombre / Razón Social">
+        </div>
+        <div>
+            <strong>Fecha:</strong> 
+            <input type="date" id="fechaPresupuesto">
+        </div>
+        <div>
+            <strong>Dirección:</strong> 
+            <input type="text" id="direccionCliente" value="" placeholder="Dirección del cliente...">
+        </div>
+    </div>
+
+    <!-- Tabla de ítems -->
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th class="col-cant">Cant.</th>
+                    <th class="col-desc">Descripción</th>
+                    <th class="col-precio">P. Unitario</th>
+                    <th class="col-sub">Subtotal</th>
+                    <th class="col-accion">Acción</th>
+                </tr>
+            </thead>
+            <tbody id="itemsTable">
+                <tr>
+                    <td class="col-cant"><input type="number" value="1" min="1" oninput="calcularTotales()"></td>
+                    <td class="col-desc"><div class="editable-desc" contenteditable="true" data-placeholder="Detalle del trabajo o producto..."></div></td>
+                    <td class="col-precio"><input type="number" value="0.00" step="0.01" min="0" oninput="calcularTotales()"></td>
+                    <td class="col-sub" style="text-align: right; padding-right: 15px;"><span class="sub-text">$0.00</span></td>
+                    <td class="col-accion"><button class="btn-delete" onclick="eliminarFila(this)">X</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <button class="btn-add" onclick="agregarFila()">+ Agregar Ítem</button>
+
+    <!-- Validez y Totales -->
+    <div class="bottom-section" style="margin-top: 15px;">
+        <div class="validity-box">
+            <strong>Condiciones:</strong> Presupuesto válido por 10 días. Trabajos con garantía de colocación.
+        </div>
+        <div class="totals-box">
+            <div class="total-row">
+                <span>Subtotal:</span>
+                <span id="lblSubtotal">$0.00</span>
+            </div>
+            <div class="total-row">
+                <span>Adicional / Descuento:</span>
+                <span>$0.00</span>
+            </div>
+            <div class="total-row final">
+                <span>TOTAL:</span>
+                <span id="lblTotal">$0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notas / Observaciones con más espacio de relleno -->
+    <div class="notes-section">
+        <label for="notasPresupuesto">Notas / Observaciones:</label>
+        <div class="editable-notes" contenteditable="true" id="notasPresupuesto" placeholder="Ej: Tiempos de entrega, aclaraciones, etc."></div>
+    </div>
+
+    <!-- Pie de página -->
+    <div class="footer">
+        <div class="footer-left">
+            <strong>PETI POLARIZADOS</strong><br>
+            Entre Ríos 3242, San José, ER
+        </div>
+        <div style="text-align: right;">
+            <strong>Contacto:</strong><br>
+            Celular: 3447 576808<br>
+            Email: peti.polarizados@gmail.com
+        </div>
+    </div>
+</div>
+
+<!-- Botones de Acción -->
+<div class="actions-bar">
+    <button class="btn-action" onclick="window.print()">Imprimir / Guardar PDF</button>
+    <button class="btn-action btn-new" onclick="nuevoPresupuesto()">Nuevo Presupuesto</button>
+</div>
+
+<script>
+    document.getElementById('fechaPresupuesto').valueAsDate = new Date();
+
+    let numeroActual = localStorage.getItem('peti_polarizados_presupuesto_num');
+    if (!numeroActual) {
+        numeroActual = 1;
+    } else {
+        numeroActual = parseInt(numeroActual);
+    }
+    actualizarNumeroDisplay();
+
+    function actualizarNumeroDisplay() {
+        document.getElementById('numeroPresupuesto').innerText = String(numeroActual).padStart(4, '0');
+    }
+
+    function agregarFila() {
+        const tbody = document.getElementById('itemsTable');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="col-cant"><input type="number" value="1" min="1" oninput="calcularTotales()"></td>
+            <td class="col-desc"><div class="editable-desc" contenteditable="true" data-placeholder="Detalle del trabajo o producto..."></div></td>
+            <td class="col-precio"><input type="number" value="0.00" step="0.01" min="0" oninput="calcularTotales()"></td>
+            <td class="col-sub" style="text-align: right; padding-right: 15px;"><span class="sub-text">$0.00</span></td>
+            <td class="col-accion"><button class="btn-delete" onclick="eliminarFila(this)">X</button></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function eliminarFila(btn) {
+        const tbody = document.getElementById('itemsTable');
+        if (tbody.rows.length > 1) {
+            btn.closest('tr').remove();
+            calcularTotales();
+        } else {
+            alert("El presupuesto debe tener al menos un ítem.");
+        }
+    }
+
+    function calcularTotales() {
+        const rows = document.querySelectorAll('#itemsTable tr');
+        let subtotalGeneral = 0;
+
+        rows.forEach(row => {
+            const cantInput = row.querySelector('.col-cant input');
+            const precioInput = row.querySelector('.col-precio input');
+            const subCell = row.querySelector('.sub-text');
+
+            const cantidad = parseFloat(cantInput.value) || 0;
+            const precioUnitario = parseFloat(precioInput.value) || 0;
+            const subtotal = cantidad * precioUnitario;
+
+            subCell.innerText = '$' + subtotal.toFixed(2);
+            subtotalGeneral += subtotal;
+        });
+
+        document.getElementById('lblSubtotal').innerText = '$' + subtotalGeneral.toFixed(2);
+        document.getElementById('lblTotal').innerText = '$' + subtotalGeneral.toFixed(2);
+    }
+
+    function nuevoPresupuesto() {
+        if (confirm("¿Deseas iniciar un nuevo presupuesto? Se incrementará el número de comprobante.")) {
+            numeroActual++;
+            localStorage.setItem('peti_polarizados_presupuesto_num', numeroActual);
+            actualizarNumeroDisplay();
+            
+            document.getElementById('nombreCliente').value = '';
+            document.getElementById('direccionCliente').value = '';
+            document.getElementById('fechaPresupuesto').valueAsDate = new Date();
+            document.getElementById('notasPresupuesto').innerText = '';
+            
+            const tbody = document.getElementById('itemsTable');
+            tbody.innerHTML = `
+                <tr>
+                    <td class="col-cant"><input type="number" value="1" min="1" oninput="calcularTotales()"></td>
+                    <td class="col-desc"><div class="editable-desc" contenteditable="true" data-placeholder="Detalle del trabajo o producto..."></div></td>
+                    <td class="col-precio"><input type="number" value="0.00" step="0.01" min="0" oninput="calcularTotales()"></td>
+                    <td class="col-sub" style="text-align: right; padding-right: 15px;"><span class="sub-text">$0.00</span></td>
+                    <td class="col-accion"><button class="btn-delete" onclick="eliminarFila(this)">X</button></td>
+                </tr>
+            `;
+            calcularTotales();
+        }
+    }
+</script>
+
+</body>
+</html>
